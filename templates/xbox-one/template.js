@@ -12,14 +12,14 @@ window.gamepad.TemplateClass = class XboxOneTemplate {
      * Destroys the template
      */
     destructor() {
-        delete this.gamepad.updateButton;
-        delete this.gamepad.updateAxis;
+        this.gamepad.updateButton = undefined;
+        this.gamepad.updateAxis = undefined;
     }
 
     updateButton($button, button) {
         if (!$button.matches('.trigger') || !button) return;
-        $button.style.setProperty('opacity', this.gamepad.triggersMeter ? 1 : `${button.value * 100}%`);
-        $button.style.setProperty('clip-path', this.gamepad.triggersMeter ? `inset(${100 - button.value * 100}% 0px 0px 0pc)` : 'none');
+        $button.style.setProperty('opacity', this.gamepad.useMeterTriggers ? 1 : `${button.value * 100}%`);
+        $button.style.setProperty('clip-path', this.gamepad.useMeterTriggers ? `inset(${100 - button.value * 100}% 0px 0px 0pc)` : 'none');
     }
 
     updateAxis($axis, attribute, axis) {
@@ -35,8 +35,8 @@ window.gamepad.TemplateClass = class XboxOneTemplate {
     }
 
     updateRotate($axis) {
-        const rotateX = parseFloat($axis.getAttribute('data-value-y') * 30);
-        const rotateY = -parseFloat($axis.getAttribute('data-value-x') * 30);
+        const rotateX = Number.parseFloat($axis.getAttribute('data-value-y') * 30);
+        const rotateY = -Number.parseFloat($axis.getAttribute('data-value-x') * 30);
         $axis.style.setProperty('transform', `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
     }
 };

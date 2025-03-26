@@ -17,6 +17,7 @@ class Gamepad {
         // cached DOM references
         this.$body = document.querySelector('body');
         this.$instructions = document.querySelector('#instructions');
+        this.$instructionsLink = this.$instructions.querySelector('a');
         this.$placeholder = document.querySelector('#placeholder');
         this.$gamepad = document.querySelector('#gamepad');
         this.$overlay = document.querySelector('#overlay');
@@ -166,7 +167,8 @@ class Gamepad {
         // by default, enqueue a delayed display of the placeholder animation
         this.displayPlaceholder();
 
-        // listen for keyboard events
+        // listen for click events
+        this.$instructionsLink.addEventListener('click', this.toggleHelp.bind(this));
         this.$helpPopoutClose.addEventListener('click', this.toggleHelp.bind(this));
     }
 
@@ -374,7 +376,9 @@ class Gamepad {
      * Updates the list of connected gamepads in the overlay
      */
     updateGamepadList() {
-        this.$gamepadSelect.querySelectorAll('.entry').forEach($entry => $entry.remove());
+        for (const $entry of this.$gamepadSelect.querySelectorAll('.entry')) {
+            $entry.remove();
+        }
         const $options = [];
         for (let key = 0; key < this.gamepads.length; key++) {
             const gamepad = this.gamepads[key];
@@ -591,7 +595,7 @@ class Gamepad {
         }
 
         // else, determine the template to use from the gamepad identifier and update settings
-        for (let gamepadType in this.identifiers) {
+        for (const gamepadType in this.identifiers) {
             if (this.identifiers[gamepadType].id.test(gamepad.id)) {
                 return gamepadType;
             }
@@ -830,7 +834,7 @@ class Gamepad {
         // save the buttons mapping of this template
         this.mapping.buttons = activeGamepad.buttons.map((_, index) => {
             const $button = document.querySelector(`[data-button='${index}']`);
-            return { $button, button: { pressed: null, value: null } };
+            return { $button, button: { pressed: null, touched: null, value: null } };
         });
 
         // save the axes mapping of this template
@@ -856,7 +860,7 @@ class Gamepad {
 
         // destruct and clear the template
         if (this.template.destructor) this.template.destructor();
-        delete this.template;
+        this.template = undefined;
     }
 
     /**
@@ -912,7 +916,8 @@ class Gamepad {
             }
 
             // save the updated button
-            this.mapping.buttons[index].button = updatedButton;
+            const { pressed, touched, value } = updatedButton;
+            this.mapping.buttons[index].button = { pressed, touched, value };
         });
     }
 
@@ -926,13 +931,15 @@ class Gamepad {
         gamepad.axes.forEach((updatedAxis, index) => {
             // get the axis information
             const { $axis, attribute, axis } = this.mapping.axes[index];
-            if (!$axis || updatedAxis === axis) return;
+            if (!$axis) return;
 
             // update the display value
-            $axis.setAttribute(attribute.replace('-axis', '-value'), updatedAxis);
+            if (updatedAxis !== axis) {
+                $axis.setAttribute(attribute.replace('-axis', '-value'), updatedAxis);
 
-            // ensure we have an axis updater callback and hook the template defined axis update method
-            if ('function' === typeof this.updateAxis) this.updateAxis($axis, attribute, updatedAxis);
+                // ensure we have an axis updater callback and hook the template defined axis update method
+                if ('function' === typeof this.updateAxis) this.updateAxis($axis, attribute, updatedAxis);
+            }
 
             // save the updated button
             this.mapping.axes[index].axis = updatedAxis;
@@ -1017,13 +1024,13 @@ class Gamepad {
                 (c) => c === color
             );
         } else {
-            if (!isNaN(parseInt(color))) {
+            if (!Number.isNaN(Number.parseInt(color))) {
                 // the color is a number, load it by its index
                 this.colorIndex = color;
             } else {
                 // the color is a string, load it by its name
                 this.colorIndex = 0;
-                for (let gamepadColorIndex in this.identifier.colors) {
+                for (const gamepadColorIndex in this.identifier.colors) {
                     if (color === this.identifier.colors[gamepadColorIndex]) {
                         this.colorIndex = gamepadColorIndex;
                         break;
@@ -1074,9 +1081,9 @@ class Gamepad {
         } else if (level === '-' && this.zoomLevel > 0.1) {
             // '-' means a zoom out if we still can
             this.zoomLevel -= 0.1;
-        } else if (!isNaN((level = parseFloat(level)))) {
-            // an integer value means a value-based zoom
-            this.zoomLevel = level;
+        } else if (!Number.isNaN(+level)) {
+            // a number value means a value-based zoom
+            this.zoomLevel = Number.parseFloat(level);
         }
 
         // hack: fix js float issues
@@ -1169,7 +1176,7 @@ class Gamepad {
      * @returns {string|boolean|null}
      */
     getUrlParam(name) {
-        let matches = new RegExp('[?&]' + name + '(=([^&#]*))?').exec(
+        const matches = new RegExp(`[?&]${name}(=([^&#]*))?`).exec(
             window.location.search
         );
         return matches ? decodeURIComponent(matches[2] || true) || true : null;
@@ -1186,10 +1193,10 @@ class Gamepad {
             .split('&')
             .map((param) => param.split('='));
         const settings = {};
-        Object.keys(settingsArr).forEach((key) => {
+        for (const key of Object.keys(settingsArr)) {
             const [k, v] = settingsArr[key];
             settings[k] = v;
-        });
+        };
         return settings;
     }
 

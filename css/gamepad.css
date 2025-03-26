@@ -1,7 +1,12 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     background: transparent;
     font-family: sans-serif;
     height: 100vh;
+    margin: 0;
     overflow: hidden;
 }
 
@@ -84,18 +89,29 @@ body.unsupported #gamepad {
     }
 }
 
+#placeholder {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 #placeholder svg {
-    height: 90%;
-    left: 50%;
     max-width: 600px;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
     width: 90%;
 }
 
 #placeholder #a-button path {
     animation: press-button 5s linear infinite;
+}
+
+#placeholder #placeholder-instructions {
+    margin-top: -40px;
 }
 
 #gamepad {

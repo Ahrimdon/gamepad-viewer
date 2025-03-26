@@ -13,8 +13,8 @@ window.gamepad.TemplateClass = class DebugTemplate {
      * Destroys the template
      */
     destructor() {
-        delete this.gamepad.updateButton;
-        delete this.gamepad.updateAxis;
+        this.gamepad.updateButton = undefined;
+        this.gamepad.updateAxis = undefined;
     }
 
     /**
@@ -103,7 +103,7 @@ window.gamepad.TemplateClass = class DebugTemplate {
     updateElem($elem, value, precision = 2) {
         this.updateTimestamp();
         $elem.innerHTML = value.toFixed(precision);
-        let color = Math.floor(255 * 0.3 + 255 * 0.7 * Math.abs(value));
+        const color = Math.floor(255 * 0.3 + 255 * 0.7 * Math.abs(value));
         $elem.style.setProperty('color', `rgb(${color}, ${color}, ${color})`);
     }
 
@@ -115,6 +115,6 @@ window.gamepad.TemplateClass = class DebugTemplate {
         if (!this.activeGamepad) {
             return;
         }
-        this.$timestamp.innerHTML = parseFloat(this.activeGamepad.timestamp).toFixed(3);
+        this.$timestamp.innerHTML = Number.parseFloat(this.activeGamepad.timestamp).toFixed(3);
     }
 };

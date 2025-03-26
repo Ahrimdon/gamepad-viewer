@@ -106,14 +106,15 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
         this.withSteering = gamepad.getUrlParam('steeringIndex') !== null;
         this.angle = gamepad.getUrlParam('angle') || 360;
         this.frequency = gamepad.getUrlParam('fps') || 60;
-        this.AXES.forEach((axis) => {
+        for(const axis of this.AXES) {
             this[axis] = {
                 type: (gamepad.getUrlParam(`${axis}Type`) || 'axis').replace('axis', 'axe'),
                 index: gamepad.getUrlParam(`${axis}Index`),
                 min: gamepad.getUrlParam(`${axis}Min`) || -1,
                 max: gamepad.getUrlParam(`${axis}Max`) || 1,
-            }
-        });
+            };
+
+        }
     }
 
     /**
@@ -254,8 +255,8 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
         const { width, height } = this.$chart;
         chartContext.clearRect(0, 0, width, height);
 
-        this.AXES.forEach((axis) => {
-            if (axis === 'steering') return;
+        for (const axis of this.AXES) {
+            if (axis === 'steering') continue;
             chartContext.beginPath();
 
             for (let index = 0; index < this.chartData.length; index++) {
@@ -267,7 +268,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
 
             chartContext.strokeStyle = this.chartColors[axis];
             chartContext.stroke();
-        });
+        }
     }
 
     /**
@@ -332,7 +333,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
                 this.$clutch.style.display = '';
             } else {
                 this.$clutch.style.display = 'none';
-                this.chartData.forEach((data) => data.clutch = 0);
+                for (const data of this.chartData) { data.clutch = 0; }
             }
         });
         $inputs.$brakeOption.addEventListener('change', () => {
@@ -341,7 +342,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
                 this.$brake.style.display = '';
             } else {
                 this.$brake.style.display = 'none';
-                this.chartData.forEach((data) => data.brake = 0);
+                for (const data of this.chartData) { data.brake = 0; }
             }
         });
         $inputs.$throttleOption.addEventListener('change', () => {
@@ -350,7 +351,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
                 this.$throttle.style.display = '';
             } else {
                 this.$throttle.style.display = 'none';
-                this.chartData.forEach((data) => data.throttle = 0);
+                for (const data of this.chartData) { data.throttle = 0; }
             }
         });
         $inputs.$steeringOption.addEventListener('change', () => {
@@ -371,7 +372,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
             this.setupChart(true);
         });
         $historyOption.addEventListener('change', () => {
-            this.historyLength = parseInt($historyOption.value) * 1000;
+            this.historyLength = Number.parseInt($historyOption.value) * 1000;
             this.setupChart(true);
         });
         $metersOption.addEventListener('change', () => {
@@ -387,7 +388,7 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
             this.angle = $steeringAngleOption.value;
         });
         $fpsOption.addEventListener('change', () => {
-            this.interval = 1000 / parseInt($fpsOption.value);
+            this.interval = 1000 / Number.parseInt($fpsOption.value);
             console.log(this.interval);
             this.setupChart(true);
         });
@@ -561,15 +562,15 @@ window.gamepad.TemplateClass = class TelemetryTemplate {
         await this.waitButtonClick();
 
         return {
-            ...this.AXES.reduce((options, axis) => ({
-                ...options,
-                [`with${this.capitalize(axis)}`]: $inputs[`$${axis}Option`].checked
-            }), {}),
+            ...this.AXES.reduce((options, axis) => Object.assign(
+                options,
+                { [`with${this.capitalize(axis)}`]: $inputs[`$${axis}Option`].checked }
+            ), {}),
             chart: $chartOption.checked,
-            history: parseInt($historyOption.value) * 1000,
+            history: Number.parseInt($historyOption.value) * 1000,
             meters: $metersOption.checked,
             angle: $steeringAngleOption.value,
-            fps: parseInt($fpsOption.value)
+            fps: Number.parseInt($fpsOption.value)
         };
     }
 
