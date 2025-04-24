@@ -5,8 +5,10 @@ window.gamepad.TemplateClass = class DebugTemplate {
     constructor() {
         this.gamepad = window.gamepad;
         this.init();
-        this.gamepad.updateButton = ($button, { value }) => this.updateElem($button, value);
-        this.gamepad.updateAxis = ($axis, _, axis) => this.updateElem($axis, axis, 6);
+        this.gamepad.updateButton = ($button, { value }) =>
+            this.updateElem($button, value);
+        this.gamepad.updateAxis = ($axis, _, axis) =>
+            this.updateElem($axis, axis, 6);
     }
 
     /**
@@ -21,35 +23,37 @@ window.gamepad.TemplateClass = class DebugTemplate {
      * Initializes the template
      */
     init() {
-        this.$name = document.querySelector('#info-name .value');
-        this.$vendor = document.querySelector('#info-vendor');
-        this.$product = document.querySelector('#info-product');
-        this.$id = document.querySelector('#info-id');
-        this.$timestamp = document.querySelector('#info-timestamp .value');
-        this.$index = document.querySelector('#info-index .value');
-        this.$mapping = document.querySelector('#info-mapping .value');
-        this.$rumble = document.querySelector('#info-rumble .value');
-        this.$axes = document.querySelector('.axes .container');
-        this.$buttons = document.querySelector('.buttons .container');
+        this.$name = document.querySelector("#info-name .value");
+        this.$vendor = document.querySelector("#info-vendor");
+        this.$product = document.querySelector("#info-product");
+        this.$id = document.querySelector("#info-id");
+        this.$timestamp = document.querySelector("#info-timestamp .value");
+        this.$index = document.querySelector("#info-index .value");
+        this.$mapping = document.querySelector("#info-mapping .value");
+        this.$rumble = document.querySelector("#info-rumble .value");
+        this.$axes = document.querySelector(".axes .container");
+        this.$buttons = document.querySelector(".buttons .container");
         const activeGamepad = this.gamepad.getActive();
-        const { name, vendor, product, id } = this.gamepad.toGamepadInfo(activeGamepad.id);
+        const { name, vendor, product, id } = this.gamepad.toGamepadInfo(
+            activeGamepad.id,
+        );
         this.$name.innerHTML = name;
-        this.$name.setAttribute('title', activeGamepad.id);
+        this.$name.setAttribute("title", activeGamepad.id);
         if (vendor && product) {
-            this.$vendor.querySelector('.value').innerHTML = vendor;
-            this.$product.querySelector('.value').innerHTML = product;
-            this.$vendor.style.setProperty('display', 'block');
-            this.$product.style.setProperty('display', 'block');
+            this.$vendor.querySelector(".value").innerHTML = vendor;
+            this.$product.querySelector(".value").innerHTML = product;
+            this.$vendor.style.setProperty("display", "block");
+            this.$product.style.setProperty("display", "block");
         } else {
-            this.$id.querySelector('.value').innerHTML = id;
-            this.$id.style.setProperty('display', 'block');
+            this.$id.querySelector(".value").innerHTML = id;
+            this.$id.style.setProperty("display", "block");
         }
         this.updateTimestamp();
         this.$index.innerHTML = this.activeGamepad.index;
-        this.$mapping.innerHTML = this.activeGamepad.mapping || 'N/A';
+        this.$mapping.innerHTML = this.activeGamepad.mapping || "N/A";
         this.$rumble.innerHTML = this.activeGamepad.vibrationActuator
             ? this.activeGamepad.vibrationActuator.type
-            : 'N/A';
+            : "N/A";
         this.initAxes();
         this.initButtons();
     }
@@ -75,8 +79,8 @@ window.gamepad.TemplateClass = class DebugTemplate {
     }
 
     /**
-    * Initializes the buttons
-    */
+     * Initializes the buttons
+     */
     initButtons() {
         for (
             let buttonIndex = 0;
@@ -104,7 +108,7 @@ window.gamepad.TemplateClass = class DebugTemplate {
         this.updateTimestamp();
         $elem.innerHTML = value.toFixed(precision);
         const color = Math.floor(255 * 0.3 + 255 * 0.7 * Math.abs(value));
-        $elem.style.setProperty('color', `rgb(${color}, ${color}, ${color})`);
+        $elem.style.setProperty("color", `rgb(${color}, ${color}, ${color})`);
     }
 
     /**
@@ -115,6 +119,8 @@ window.gamepad.TemplateClass = class DebugTemplate {
         if (!this.activeGamepad) {
             return;
         }
-        this.$timestamp.innerHTML = Number.parseFloat(this.activeGamepad.timestamp).toFixed(3);
+        this.$timestamp.innerHTML = Number.parseFloat(
+            this.activeGamepad.timestamp,
+        ).toFixed(3);
     }
 };

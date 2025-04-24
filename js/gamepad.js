@@ -6,44 +6,58 @@
 class Gamepad {
     REGEX = {
         CHROME: /^(?<name>.*) \((?:.*?Vendor: (?<vendor>[0-9a-f]{4}) Product: (?<product>[0-9a-f]{4})|(?<id>.*))\)$/i,
-        FIREFOX: /^((?<vendor>[0-9a-f]{4})-(?<product>[0-9a-f]{4})-(?<name>.*))$/i,
+        FIREFOX:
+            /^((?<vendor>[0-9a-f]{4})-(?<product>[0-9a-f]{4})-(?<name>.*))$/i,
         OTHER: /^(?<name>.*)$/i,
-    }
+    };
 
     /**
      * Creates an instance of Gamepad.
      */
     constructor() {
         // cached DOM references
-        this.$body = document.querySelector('body');
-        this.$instructions = document.querySelector('#instructions');
-        this.$instructionsLink = this.$instructions.querySelector('a');
-        this.$placeholder = document.querySelector('#placeholder');
-        this.$gamepad = document.querySelector('#gamepad');
-        this.$overlay = document.querySelector('#overlay');
-        this.$gamepadSelect = document.querySelector('select[name=gamepad-id]');
-        this.$skinSelect = document.querySelector('select[name=skin]');
-        this.$backgroundSelect = document.querySelector('select[name=background]');
-        this.$colorOverlay = this.$overlay.querySelector('#color');
-        this.$colorSelect = this.$colorOverlay.querySelector('select[name=color]');
-        this.$triggersOverlay = this.$overlay.querySelector('#triggers');
-        this.$triggersSelect = this.$triggersOverlay.querySelector('select[name=triggers]');
-        this.$helpPopout = document.querySelector('#help.popout');
-        this.$helpPopoutClose = this.$helpPopout.querySelector('.close');
-        this.$gamepadList = document.querySelector('#gamepad-list');
+        this.$body = document.querySelector("body");
+        this.$instructions = document.querySelector("#instructions");
+        this.$instructionsLink = this.$instructions.querySelector("a");
+        this.$placeholder = document.querySelector("#placeholder");
+        this.$gamepad = document.querySelector("#gamepad");
+        this.$overlay = document.querySelector("#overlay");
+        this.$gamepadSelect = document.querySelector("select[name=gamepad-id]");
+        this.$skinSelect = document.querySelector("select[name=skin]");
+        this.$backgroundSelect = document.querySelector(
+            "select[name=background]",
+        );
+        this.$colorOverlay = this.$overlay.querySelector("#color");
+        this.$colorSelect =
+            this.$colorOverlay.querySelector("select[name=color]");
+        this.$triggersOverlay = this.$overlay.querySelector("#triggers");
+        this.$triggersSelect = this.$triggersOverlay.querySelector(
+            "select[name=triggers]",
+        );
+        this.$helpPopout = document.querySelector("#help.popout");
+        this.$helpPopoutClose = this.$helpPopout.querySelector(".close");
+        this.$gamepadList = document.querySelector("#gamepad-list");
 
         // ensure the GamePad API is available on this browser
         this.assertGamepadAPI();
 
         // overlay selectors
         this.backgrounds = [
-            { name: 'transparent', backgroundColor: 'transparent', textColor: 'black' },
-            { name: 'checkered', backgroundColor: 'url(css/transparent-bg.png)', textColor: 'black' },
-            { name: 'dimgrey', backgroundColor: 'dimgrey', textColor: 'black' },
-            { name: 'black', backgroundColor: 'black', textColor: 'white' },
-            { name: 'white', backgroundColor: 'white', textColor: 'black' },
-            { name: 'lime', backgroundColor: 'lime', textColor: 'black' },
-            { name: 'magenta', backgroundColor: 'magenta', textColor: 'black' },
+            {
+                name: "transparent",
+                backgroundColor: "transparent",
+                textColor: "black",
+            },
+            {
+                name: "checkered",
+                backgroundColor: "url(css/transparent-bg.png)",
+                textColor: "black",
+            },
+            { name: "dimgrey", backgroundColor: "dimgrey", textColor: "black" },
+            { name: "black", backgroundColor: "black", textColor: "white" },
+            { name: "white", backgroundColor: "white", textColor: "black" },
+            { name: "lime", backgroundColor: "lime", textColor: "black" },
+            { name: "magenta", backgroundColor: "magenta", textColor: "black" },
         ];
         this.initOverlaySelectors();
 
@@ -53,19 +67,19 @@ class Gamepad {
             // See: https://html5gamepad.com/codes
             debug: {
                 id: /debug/,
-                name: 'Debug',
+                name: "Debug",
             },
             ds4: {
                 id: /05c4|09cc|0104|046d|0810|2563/, // 05c4,09cc,0104 = DS4 controllers product codes, 046d,0810,2563 = PS-like controllers vendor codes
-                name: 'DualShock 4',
-                colors: ['black', 'white', 'red', 'blue'],
+                name: "DualShock 4",
+                colors: ["black", "white", "red", "blue"],
                 triggers: true,
                 zoom: true,
             },
             dualsense: {
                 id: /0ce6/, // 0ce6 = DualSense controller product code
-                name: 'DualSense',
-                colors: ['white', 'black'],
+                name: "DualSense",
+                colors: ["white", "black"],
                 triggers: true,
                 zoom: true,
             },
@@ -91,13 +105,13 @@ class Gamepad {
             // },
             telemetry: {
                 id: /telemetry/,
-                name: 'Telemetry',
-                zoom: true
+                name: "Telemetry",
+                zoom: true,
             },
-            'xbox-one': {
+            "xbox-one": {
                 id: /045e|xinput|XInput/, // 045e = Microsoft vendor code, xinput = standard Windows controller
-                name: 'Xbox One',
-                colors: ['black', 'white'],
+                name: "Xbox One",
+                colors: ["black", "white"],
                 triggers: true,
                 zoom: true,
             },
@@ -124,7 +138,7 @@ class Gamepad {
         this.colorIndex = null;
         this.colorName = null;
         this.useMeterTriggers = false;
-        this.zoomMode = 'auto';
+        this.zoomMode = "auto";
         this.zoomLevel = 1;
         this.mapping = {
             buttons: [],
@@ -132,44 +146,50 @@ class Gamepad {
         };
 
         // listen for gamepad related events
-        this.haveEvents = 'GamepadEvent' in window;
+        this.haveEvents = "GamepadEvent" in window;
         if (this.haveEvents) {
             window.addEventListener(
-                'gamepadconnected',
-                this.onGamepadConnect.bind(this)
+                "gamepadconnected",
+                this.onGamepadConnect.bind(this),
             );
             window.addEventListener(
-                'gamepaddisconnected',
-                this.onGamepadDisconnect.bind(this)
+                "gamepaddisconnected",
+                this.onGamepadDisconnect.bind(this),
             );
         }
 
         // listen for mouse move events
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener("mousemove", this.onMouseMove.bind(this));
         // listen for keyboard events
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
+        window.addEventListener("keydown", this.onKeyDown.bind(this));
         // listen for keyboard events
-        window.addEventListener('resize', this.onResize.bind(this));
+        window.addEventListener("resize", this.onResize.bind(this));
 
         // bind a gamepads scan
         window.setInterval(this.scan.bind(this), this.scanDelay);
 
         // change the type if specified
-        const skin = this.getUrlParam('type');
+        const skin = this.getUrlParam("type");
         if (skin) {
             this.changeSkin(skin);
         }
 
         // change the background if specified
-        const background = this.getUrlParam('background');
+        const background = this.getUrlParam("background");
         if (background) this.changeBackground(background);
 
         // by default, enqueue a delayed display of the placeholder animation
         this.displayPlaceholder();
 
         // listen for click events
-        this.$instructionsLink.addEventListener('click', this.toggleHelp.bind(this));
-        this.$helpPopoutClose.addEventListener('click', this.toggleHelp.bind(this));
+        this.$instructionsLink.addEventListener(
+            "click",
+            this.toggleHelp.bind(this),
+        );
+        this.$helpPopoutClose.addEventListener(
+            "click",
+            this.toggleHelp.bind(this),
+        );
     }
 
     /**
@@ -179,11 +199,11 @@ class Gamepad {
         const getGamepadsFn = navigator.getGamepads
             ? () => navigator.getGamepads()
             : navigator.webkitGetGamepads
-                ? () => navigator.webkitGetGamepads()
-                : null;
+              ? () => navigator.webkitGetGamepads()
+              : null;
         if (!getGamepadsFn) {
-            this.$body.classList.add('unsupported');
-            throw new Error('Unsupported gamepad API');
+            this.$body.classList.add("unsupported");
+            throw new Error("Unsupported gamepad API");
         }
         this.getNavigatorGamepads = getGamepadsFn;
     }
@@ -192,20 +212,20 @@ class Gamepad {
      * Initialises the overlay selectors
      */
     initOverlaySelectors() {
-        this.$gamepadSelect.addEventListener('change', () =>
-            this.changeGamepad(this.$gamepadSelect.value)
+        this.$gamepadSelect.addEventListener("change", () =>
+            this.changeGamepad(this.$gamepadSelect.value),
         );
-        this.$skinSelect.addEventListener('change', () =>
-            this.changeSkin(this.$skinSelect.value)
+        this.$skinSelect.addEventListener("change", () =>
+            this.changeSkin(this.$skinSelect.value),
         );
-        this.$backgroundSelect.addEventListener('change', () =>
-            this.changeBackground(this.$backgroundSelect.value)
+        this.$backgroundSelect.addEventListener("change", () =>
+            this.changeBackground(this.$backgroundSelect.value),
         );
-        this.$colorSelect.addEventListener('change', () =>
-            this.changeGamepadColor(this.$colorSelect.value)
+        this.$colorSelect.addEventListener("change", () =>
+            this.changeGamepadColor(this.$colorSelect.value),
         );
-        this.$triggersSelect.addEventListener('change', () =>
-            this.toggleTriggers(this.$triggersSelect.value === 'meter')
+        this.$triggersSelect.addEventListener("change", () =>
+            this.toggleTriggers(this.$triggersSelect.value === "meter"),
         );
     }
 
@@ -215,8 +235,8 @@ class Gamepad {
      * @param {HTMLElement} $element
      */
     show($element) {
-        $element.style.removeProperty('display');
-        $element.classList.remove('fadeIn', 'fadeOut');
+        $element.style.removeProperty("display");
+        $element.classList.remove("fadeIn", "fadeOut");
     }
 
     /**
@@ -225,8 +245,8 @@ class Gamepad {
      * @param {HTMLElement} $element
      */
     hide($element) {
-        $element.style.setProperty('display', 'none');
-        $element.classList.remove('fadeIn', 'fadeOut');
+        $element.style.setProperty("display", "none");
+        $element.classList.remove("fadeIn", "fadeOut");
     }
 
     /**
@@ -235,9 +255,9 @@ class Gamepad {
      * @param {HTMLElement} $element
      */
     fadeIn($element) {
-        $element.style.removeProperty('display');
-        $element.classList.remove('fadeOut');
-        $element.classList.add('fadeIn');
+        $element.style.removeProperty("display");
+        $element.classList.remove("fadeOut");
+        $element.classList.add("fadeIn");
     }
 
     /**
@@ -246,9 +266,9 @@ class Gamepad {
      * @param {HTMLElement} $element
      */
     fadeOut($element) {
-        $element.style.removeProperty('display');
-        $element.classList.remove('fadeIn');
-        $element.classList.add('fadeOut');
+        $element.style.removeProperty("display");
+        $element.classList.remove("fadeIn");
+        $element.classList.add("fadeOut");
     }
 
     /**
@@ -283,7 +303,7 @@ class Gamepad {
         // hide instructions animation if no gamepad is active after X ms
         this.instructionsTimeout = window.setTimeout(
             () => this.fadeOut(this.$instructions),
-            this.instructionsDelay
+            this.instructionsDelay,
         );
     }
 
@@ -319,7 +339,7 @@ class Gamepad {
         // hide placeholder animation if no gamepad is active after X ms
         this.placeholderTimeout = window.setTimeout(
             () => this.fadeOut(this.$placeholder),
-            this.placeholderDelay
+            this.placeholderDelay,
         );
     }
 
@@ -352,7 +372,7 @@ class Gamepad {
         // hide overlay animation if no gamepad is active after X ms
         this.overlayTimeout = window.setTimeout(
             () => this.fadeOut(this.$overlay),
-            this.overlayDelay
+            this.overlayDelay,
         );
     }
 
@@ -369,14 +389,14 @@ class Gamepad {
         if (firefoxResults) return firefoxResults.groups;
         const otherResults = this.REGEX.OTHER.exec(id);
         if (otherResults) return otherResults.groups;
-        return { name: id, vendor: '', product: '' };
+        return { name: id, vendor: "", product: "" };
     }
 
     /**
      * Updates the list of connected gamepads in the overlay
      */
     updateGamepadList() {
-        for (const $entry of this.$gamepadSelect.querySelectorAll('.entry')) {
+        for (const $entry of this.$gamepadSelect.querySelectorAll(".entry")) {
             $entry.remove();
         }
         const $options = [];
@@ -385,10 +405,10 @@ class Gamepad {
             if (!gamepad) continue;
             const { name } = this.toGamepadInfo(gamepad.id);
             $options.push(
-                `<option class='entry' value='${gamepad.id}'>${name}</option>`
+                `<option class='entry' value='${gamepad.id}'>${name}</option>`,
             );
         }
-        this.$gamepadSelect.innerHTML += $options.join('');
+        this.$gamepadSelect.innerHTML += $options.join("");
     }
 
     /**
@@ -407,9 +427,10 @@ class Gamepad {
         }
 
         const colorOptions = colors.map(
-            (color) => `<option value='${color}'>${color.charAt(0).toUpperCase()}${color.slice(1)}</option>`
+            (color) =>
+                `<option value='${color}'>${color.charAt(0).toUpperCase()}${color.slice(1)}</option>`,
         );
-        this.$colorSelect.innerHTML = colorOptions.join('');
+        this.$colorSelect.innerHTML = colorOptions.join("");
         this.show(this.$colorOverlay);
     }
 
@@ -461,7 +482,7 @@ class Gamepad {
 
         if (e.gamepad.index === this.index) {
             // display a disconnection indicator
-            this.$gamepad.classList.add('disconnected');
+            this.$gamepad.classList.add("disconnected");
             this.disconnectedIndex = e.gamepad.index;
 
             // refresh gamepad list on help, if displayed
@@ -485,43 +506,43 @@ class Gamepad {
      */
     onKeyDown(e) {
         switch (e.code) {
-            case 'Delete':
-            case 'Escape':
+            case "Delete":
+            case "Escape":
                 this.clear();
                 this.displayPlaceholder();
                 break;
-            case 'KeyB':
+            case "KeyB":
                 this.changeBackground();
                 break;
-            case 'KeyC':
+            case "KeyC":
                 this.changeGamepadColor();
                 break;
-            case 'KeyD':
+            case "KeyD":
                 this.toggleDebug();
                 break;
-            case 'KeyG':
+            case "KeyG":
                 this.toggleGamepadType();
                 break;
-            case 'KeyH':
+            case "KeyH":
                 this.toggleHelp();
                 break;
-            case 'KeyT':
+            case "KeyT":
                 this.toggleTriggers();
                 break;
-            case 'NumpadAdd':
-            case 'Equal':
-                this.changeZoom('+');
+            case "NumpadAdd":
+            case "Equal":
+                this.changeZoom("+");
                 break;
-            case 'NumpadSubtract':
-            case 'Minus':
-                this.changeZoom('-');
+            case "NumpadSubtract":
+            case "Minus":
+                this.changeZoom("-");
                 break;
-            case 'Numpad5':
-            case 'Digit5':
-                this.changeZoom('auto');
+            case "Numpad5":
+            case "Digit5":
+                this.changeZoom("auto");
                 break;
-            case 'Numpad0':
-            case 'Digit0':
+            case "Numpad0":
+            case "Digit0":
                 this.changeZoom(0);
                 break;
         }
@@ -531,7 +552,7 @@ class Gamepad {
      * Handles the keyboard 'keydown' event
      */
     onResize() {
-        if (this.zoomMode === 'auto') this.changeZoom('auto');
+        if (this.zoomMode === "auto") this.changeZoom("auto");
     }
 
     /**
@@ -554,15 +575,18 @@ class Gamepad {
         for (let key = 0; key < this.gamepads.length; key++) {
             const gamepad = this.gamepads[key];
             if (!gamepad) continue;
-            $tbody.push(`<tr><td>${gamepad.index}</td><td>${gamepad.id}</td></tr>`);
+            $tbody.push(
+                `<tr><td>${gamepad.index}</td><td>${gamepad.id}</td></tr>`,
+            );
         }
 
         if ($tbody.length === 0) {
-            this.$gamepadList.innerHTML = '<tr><td colspan="2">No gamepad detected.</td></tr>';
+            this.$gamepadList.innerHTML =
+                '<tr><td colspan="2">No gamepad detected.</td></tr>';
             return;
         }
 
-        this.$gamepadList.innerHTML = $tbody.join('');
+        this.$gamepadList.innerHTML = $tbody.join("");
     }
 
     /**
@@ -581,12 +605,12 @@ class Gamepad {
      * @returns {string}
      */
     getType(gamepad) {
-        const type = this.getUrlParam('type');
+        const type = this.getUrlParam("type");
 
         // if the debug option is active, use the associated template
-        if (type === 'debug') this.debug = true;
+        if (type === "debug") this.debug = true;
         if (this.debug) {
-            return 'debug';
+            return "debug";
         }
 
         // if the gamepad type is set through params, apply it
@@ -601,7 +625,7 @@ class Gamepad {
             }
         }
 
-        return 'debug';
+        return "debug";
     }
 
     /**
@@ -624,13 +648,14 @@ class Gamepad {
             if (
                 null !== this.disconnectedIndex &&
                 index !== this.disconnectedIndex
-            ) continue;
+            )
+                continue;
 
             const gamepad = this.gamepads[index];
             if (!gamepad) continue;
 
             // check the parameters for a selected gamepad
-            const gamepadId = this.getUrlParam('gamepad');
+            const gamepadId = this.getUrlParam("gamepad");
             if (gamepadId === gamepad.id) {
                 this.map(gamepad.index);
                 return;
@@ -658,7 +683,7 @@ class Gamepad {
                                 strongMagnitude: 0.2,
                                 weakMagnitude: 1,
                                 startDelay: 0,
-                            }
+                            },
                         );
                     }
 
@@ -675,7 +700,7 @@ class Gamepad {
      */
     map(index) {
         // ensure a gamepad need to be mapped
-        if ('undefined' === typeof index) return;
+        if ("undefined" === typeof index) return;
 
         // hide the help messages
         this.hideInstructions(true);
@@ -684,7 +709,7 @@ class Gamepad {
         // update local references
         this.index = index;
         this.disconnectedIndex = null;
-        this.$gamepad.classList.remove('disconnected');
+        this.$gamepad.classList.remove("disconnected");
         const gamepad = this.getActive();
 
         // ensure that a gamepad was actually found for this index
@@ -722,8 +747,12 @@ class Gamepad {
      */
     async toHash(value) {
         return crypto.subtle
-            .digest('SHA-1', new TextEncoder().encode(value))
-            .then(ab => encodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(ab))));
+            .digest("SHA-1", new TextEncoder().encode(value))
+            .then((ab) =>
+                encodeURIComponent(
+                    String.fromCharCode.apply(null, new Uint8Array(ab)),
+                ),
+            );
     }
 
     /**
@@ -746,9 +775,9 @@ class Gamepad {
         this.colorIndex = null;
         this.colorName = null;
         this.zoomLevel = 1;
-        this.$gamepad.innerHTML = '';
-        this.$gamepad.classList.remove('fadeIn');
-        this.$gamepadSelect.value = 'auto';
+        this.$gamepad.innerHTML = "";
+        this.$gamepad.classList.remove("fadeIn");
+        this.$gamepadSelect.value = "auto";
         this.updateColors();
         this.updateTriggers();
         this.clearUrlParams();
@@ -758,12 +787,12 @@ class Gamepad {
      * Loads the template script and stylesheet
      */
     loadTemplateAssets() {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
         link.href = `templates/${this.type}/template.css`;
         this.$gamepad.appendChild(link);
 
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.async = true;
         script.src = `templates/${this.type}/template.js`;
         script.onload = () => {
@@ -772,7 +801,7 @@ class Gamepad {
 
             // enqueue the initial display refresh
             this.startTemplate();
-        }
+        };
         this.$gamepad.appendChild(script);
     }
 
@@ -781,7 +810,7 @@ class Gamepad {
      */
     loadTemplate() {
         // hide the gamepad while we prepare it
-        this.$gamepad.style.setProperty('display', 'none');
+        this.$gamepad.style.setProperty("display", "none");
 
         fetch(`templates/${this.type}/template.html`)
             .then((response) => response.text())
@@ -794,13 +823,15 @@ class Gamepad {
                 const identifier = this.identifiers[this.type];
                 // - color
                 if (identifier.colors) {
-                    this.changeGamepadColor(this.getUrlParam('color'));
+                    this.changeGamepadColor(this.getUrlParam("color"));
                 } else {
                     this.updateUrlParams({ color: undefined });
                 }
                 // - triggers mode
                 if (identifier.triggers) {
-                    this.toggleTriggers(this.getUrlParam('triggers') === 'meter');
+                    this.toggleTriggers(
+                        this.getUrlParam("triggers") === "meter",
+                    );
                 } else {
                     this.updateUrlParams({ triggers: undefined });
                 }
@@ -808,19 +839,19 @@ class Gamepad {
                 if (identifier.zoom) {
                     window.setTimeout(() =>
                         this.changeZoom(
-                            this.type === 'debug'
-                                ? 'auto'
-                                : this.getUrlParam('zoom') || 'auto'
-                        )
+                            this.type === "debug"
+                                ? "auto"
+                                : this.getUrlParam("zoom") || "auto",
+                        ),
                     );
                 } else {
                     this.updateUrlParams({ zoom: undefined });
                 }
 
                 // once fully loaded, display the gamepad
-                this.$gamepad.style.removeProperty('display');
-                this.$gamepad.classList.remove('fadeOut');
-                this.$gamepad.classList.add('fadeIn');
+                this.$gamepad.style.removeProperty("display");
+                this.$gamepad.classList.remove("fadeOut");
+                this.$gamepad.classList.add("fadeIn");
             });
     }
 
@@ -834,14 +865,23 @@ class Gamepad {
         // save the buttons mapping of this template
         this.mapping.buttons = activeGamepad.buttons.map((_, index) => {
             const $button = document.querySelector(`[data-button='${index}']`);
-            return { $button, button: { pressed: null, touched: null, value: null } };
+            return {
+                $button,
+                button: { pressed: null, touched: null, value: null },
+            };
         });
 
         // save the axes mapping of this template
         this.mapping.axes = activeGamepad.axes.map((_, index) => {
-            const { $axis, attribute } = ['data-axis', 'data-axis-x', 'data-axis-y'].reduce((acc, attribute) => {
+            const { $axis, attribute } = [
+                "data-axis",
+                "data-axis-x",
+                "data-axis-y",
+            ].reduce((acc, attribute) => {
                 if (acc.$axis) return acc;
-                const $axis = document.querySelector(`[${attribute}='${index}']`);
+                const $axis = document.querySelector(
+                    `[${attribute}='${index}']`,
+                );
                 return $axis ? { $axis, attribute, axis: null } : acc;
             }, {});
             return { $axis, attribute };
@@ -870,7 +910,8 @@ class Gamepad {
      */
     pollStatus(force = false) {
         // ensure that a gamepad is currently active
-        if (this.index === null || this.index === this.disconnectedIndex) return;
+        if (this.index === null || this.index === this.disconnectedIndex)
+            return;
 
         // enqueue the next refresh
         window.requestAnimationFrame(this.pollStatus.bind(this));
@@ -907,12 +948,13 @@ class Gamepad {
                 updatedButton.touched !== button.touched ||
                 updatedButton.value !== button.value
             ) {
-                $button.setAttribute('data-pressed', updatedButton.pressed);
-                $button.setAttribute('data-touched', updatedButton.touched);
-                $button.setAttribute('data-value', updatedButton.value);
+                $button.setAttribute("data-pressed", updatedButton.pressed);
+                $button.setAttribute("data-touched", updatedButton.touched);
+                $button.setAttribute("data-value", updatedButton.value);
 
                 // ensure we have a button updater callback and hook the template defined button update method
-                if ('function' === typeof this.updateButton) this.updateButton($button, updatedButton);
+                if ("function" === typeof this.updateButton)
+                    this.updateButton($button, updatedButton);
             }
 
             // save the updated button
@@ -935,10 +977,14 @@ class Gamepad {
 
             // update the display value
             if (updatedAxis !== axis) {
-                $axis.setAttribute(attribute.replace('-axis', '-value'), updatedAxis);
+                $axis.setAttribute(
+                    attribute.replace("-axis", "-value"),
+                    updatedAxis,
+                );
 
                 // ensure we have an axis updater callback and hook the template defined axis update method
-                if ('function' === typeof this.updateAxis) this.updateAxis($axis, attribute, updatedAxis);
+                if ("function" === typeof this.updateAxis)
+                    this.updateAxis($axis, attribute, updatedAxis);
             }
 
             // save the updated button
@@ -953,10 +999,10 @@ class Gamepad {
      */
     changeGamepad(id) {
         // get the index corresponding to the identifier of the gamepad
-        const index = this.gamepads.findIndex(g => g && id === g.id);
+        const index = this.gamepads.findIndex((g) => g && id === g.id);
 
         // set the selected gamepad
-        this.updateUrlParams({ gamepad: id !== 'auto' ? id : undefined });
+        this.updateUrlParams({ gamepad: id !== "auto" ? id : undefined });
         index === -1 ? this.clear() : this.map(index);
     }
 
@@ -973,8 +1019,8 @@ class Gamepad {
         this.$skinSelect.value = skin;
 
         // set the selected skin
-        this.debug = skin === 'debug';
-        this.updateUrlParams({ type: skin !== 'auto' ? skin : undefined });
+        this.debug = skin === "debug";
+        this.updateUrlParams({ type: skin !== "auto" ? skin : undefined });
         this.map(this.index);
     }
 
@@ -984,20 +1030,23 @@ class Gamepad {
      * @param {string|number|undefined} indexOrName
      */
     changeBackground(indexOrName) {
-        if ('undefined' === typeof indexOrName) {
+        if ("undefined" === typeof indexOrName) {
             this.backgroundIndex++;
             if (this.backgroundIndex > this.backgrounds.length - 1) {
                 this.backgroundIndex = 0;
             }
-        } else if ('string' === typeof indexOrName) {
-            this.backgroundIndex = this.backgrounds.findIndex(({ name }) => name === indexOrName);
+        } else if ("string" === typeof indexOrName) {
+            this.backgroundIndex = this.backgrounds.findIndex(
+                ({ name }) => name === indexOrName,
+            );
         } else {
             this.backgroundIndex = indexOrName;
         }
-        const { name, backgroundColor, textColor } = this.backgrounds[this.backgroundIndex];
+        const { name, backgroundColor, textColor } =
+            this.backgrounds[this.backgroundIndex];
 
-        this.$body.style.setProperty('background', backgroundColor);
-        this.$body.style.setProperty('color', textColor);
+        this.$body.style.setProperty("background", backgroundColor);
+        this.$body.style.setProperty("color", textColor);
 
         // update current settings
         this.updateUrlParams({ background: name });
@@ -1013,15 +1062,15 @@ class Gamepad {
         // ensure that a gamepad is currently active
         if (this.index === null) return;
 
-        if ('undefined' === typeof color) {
+        if ("undefined" === typeof color) {
             // no color was specified, load the next one in list
             this.colorIndex++;
             if (this.colorIndex > this.identifier.colors.length - 1) {
                 this.colorIndex = 0;
             }
-        } else if ('string' === typeof style) {
+        } else if ("string" === typeof style) {
             this.colorIndex = this.identifier.colors.findIndex(
-                (c) => c === color
+                (c) => c === color,
             );
         } else {
             if (!Number.isNaN(Number.parseInt(color))) {
@@ -1043,7 +1092,7 @@ class Gamepad {
             : null;
 
         // update the DOM with the color value
-        this.$gamepad.setAttribute('data-color', this.colorName);
+        this.$gamepad.setAttribute("data-color", this.colorName);
 
         // update current settings
         this.updateUrlParams({ color: this.colorName });
@@ -1060,25 +1109,25 @@ class Gamepad {
         if (this.index === null) return;
 
         // ensure we have some data to process
-        if (typeof level === 'undefined') return;
+        if (typeof level === "undefined") return;
 
-        this.zoomMode = level === 'auto' ? 'auto' : 'manual';
+        this.zoomMode = level === "auto" ? "auto" : "manual";
 
-        if (this.zoomMode === 'auto') {
+        if (this.zoomMode === "auto") {
             // 'auto' means a 'contained in window' zoom, with a max zoom of 1
             const { width, height } = this.$gamepad.getBoundingClientRect();
             this.zoomLevel = Math.min(
                 window.innerWidth / width,
                 window.innerHeight / height,
-                1
+                1,
             );
         } else if (level === 0) {
             // 0 means a zoom reset
             this.zoomLevel = 1;
-        } else if (level === '+' && this.zoomLevel < 4) {
+        } else if (level === "+" && this.zoomLevel < 4) {
             // '+' means a zoom in if we still can
             this.zoomLevel += 0.1;
-        } else if (level === '-' && this.zoomLevel > 0.1) {
+        } else if (level === "-" && this.zoomLevel > 0.1) {
             // '-' means a zoom out if we still can
             this.zoomLevel -= 0.1;
         } else if (!Number.isNaN(+level)) {
@@ -1091,13 +1140,13 @@ class Gamepad {
 
         // update the DOM with the zoom value
         this.$gamepad.style.setProperty(
-            'transform',
-            `scale(${this.zoomLevel}, ${this.zoomLevel})`
+            "transform",
+            `scale(${this.zoomLevel}, ${this.zoomLevel})`,
         );
 
         // update current settings
         this.updateUrlParams({
-            zoom: this.zoomMode === 'auto' ? undefined : this.zoomLevel,
+            zoom: this.zoomMode === "auto" ? undefined : this.zoomLevel,
         });
     }
 
@@ -1113,7 +1162,7 @@ class Gamepad {
 
         // compute next type
         const types = Object.keys(this.identifiers).filter(
-            (i) => i !== 'debug'
+            (i) => i !== "debug",
         );
         let typeIndex = types.reduce((typeIndex, type, index) => {
             return type === this.type ? index : typeIndex;
@@ -1140,7 +1189,7 @@ class Gamepad {
         this.debug = debug !== undefined ? debug : !this.debug;
 
         // update current settings
-        this.changeSkin(this.debug ? 'debug' : 'auto')
+        this.changeSkin(this.debug ? "debug" : "auto");
     }
 
     /**
@@ -1148,8 +1197,8 @@ class Gamepad {
      */
     toggleHelp() {
         // display the help popout
-        this.$helpPopout.classList.toggle('active');
-        this.helpVisible = this.$helpPopout.classList.contains('active');
+        this.$helpPopout.classList.toggle("active");
+        this.helpVisible = this.$helpPopout.classList.contains("active");
     }
 
     /**
@@ -1162,9 +1211,12 @@ class Gamepad {
         if (this.index === null) return;
 
         // update current settings
-        this.useMeterTriggers = useMeter !== undefined ? useMeter : !this.useMeterTriggers;
-        this.$gamepad.classList[this.useMeterTriggers ? 'add' : 'remove']('triggers-meter');
-        const triggers = this.useMeterTriggers ? 'meter' : 'opacity';
+        this.useMeterTriggers =
+            useMeter !== undefined ? useMeter : !this.useMeterTriggers;
+        this.$gamepad.classList[this.useMeterTriggers ? "add" : "remove"](
+            "triggers-meter",
+        );
+        const triggers = this.useMeterTriggers ? "meter" : "opacity";
         this.updateUrlParams({ triggers });
         this.$triggersSelect.value = triggers;
     }
@@ -1177,7 +1229,7 @@ class Gamepad {
      */
     getUrlParam(name) {
         const matches = new RegExp(`[?&]${name}(=([^&#]*))?`).exec(
-            window.location.search
+            window.location.search,
         );
         return matches ? decodeURIComponent(matches[2] || true) || true : null;
     }
@@ -1189,14 +1241,14 @@ class Gamepad {
      */
     getUrlParams() {
         const settingsArr = window.location.search
-            .replace('?', '')
-            .split('&')
-            .map((param) => param.split('='));
+            .replace("?", "")
+            .split("&")
+            .map((param) => param.split("="));
         const settings = {};
         for (const key of Object.keys(settingsArr)) {
             const [k, v] = settingsArr[key];
             settings[k] = v;
-        };
+        }
         return settings;
     }
 
@@ -1224,7 +1276,7 @@ class Gamepad {
         const query = Object.entries(params)
             .filter(([, value]) => value !== undefined && value !== null)
             .map(([key, value]) => `${key}=${value}`)
-            .join('&');
+            .join("&");
         window.history.replaceState({}, document.title, `/?${query}`);
     }
 }

@@ -17,26 +17,41 @@ window.gamepad.TemplateClass = class XboxOneTemplate {
     }
 
     updateButton($button, button) {
-        if (!$button.matches('.trigger') || !button) return;
-        $button.style.setProperty('opacity', this.gamepad.useMeterTriggers ? 1 : `${button.value * 100}%`);
-        $button.style.setProperty('clip-path', this.gamepad.useMeterTriggers ? `inset(${100 - button.value * 100}% 0px 0px 0pc)` : 'none');
+        if (!$button.matches(".trigger") || !button) return;
+        $button.style.setProperty(
+            "opacity",
+            this.gamepad.useMeterTriggers ? 1 : `${button.value * 100}%`,
+        );
+        $button.style.setProperty(
+            "clip-path",
+            this.gamepad.useMeterTriggers
+                ? `inset(${100 - button.value * 100}% 0px 0px 0pc)`
+                : "none",
+        );
     }
 
     updateAxis($axis, attribute, axis) {
-        if (!$axis.matches('.stick')) return;
-        if (attribute === 'data-axis-x') {
-            $axis.style.setProperty('margin-left', `${axis * 25}px`);
+        if (!$axis.matches(".stick")) return;
+        if (attribute === "data-axis-x") {
+            $axis.style.setProperty("margin-left", `${axis * 25}px`);
             this.updateRotate($axis);
         }
-        if (attribute === 'data-axis-y') {
-            $axis.style.setProperty('margin-top', `${axis * 25}px`);
+        if (attribute === "data-axis-y") {
+            $axis.style.setProperty("margin-top", `${axis * 25}px`);
             this.updateRotate($axis);
         }
     }
 
     updateRotate($axis) {
-        const rotateX = Number.parseFloat($axis.getAttribute('data-value-y') * 30);
-        const rotateY = -Number.parseFloat($axis.getAttribute('data-value-x') * 30);
-        $axis.style.setProperty('transform', `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+        const rotateX = Number.parseFloat(
+            $axis.getAttribute("data-value-y") * 30,
+        );
+        const rotateY = -Number.parseFloat(
+            $axis.getAttribute("data-value-x") * 30,
+        );
+        $axis.style.setProperty(
+            "transform",
+            `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        );
     }
 };

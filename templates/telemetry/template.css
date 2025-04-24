@@ -11,9 +11,9 @@
     --white-color: white;
     --main-bg-color: black;
     --main-component-color: #333;
-    --clutch-color: #2D64B9;
-    --brake-color: #A52725;
-    --throttle-color: #0CA818;
+    --clutch-color: #2d64b9;
+    --brake-color: #a52725;
+    --throttle-color: #0ca818;
 }
 
 #gamepad #telemetry:has(#steering:not([style*="display: none"])) {
@@ -26,7 +26,7 @@
     box-sizing: border-box;
 }
 
-#gamepad #telemetry>*+* {
+#gamepad #telemetry > * + * {
     margin-left: 2px;
 }
 
@@ -53,7 +53,7 @@
     width: 30px;
 }
 
-#gamepad #telemetry #meters .meter+.meter {
+#gamepad #telemetry #meters .meter + .meter {
     margin-left: 2px;
 }
 
@@ -132,7 +132,6 @@
 #wizard #wizard-instructions p {
     text-align: center;
 }
-
 
 #wizard .wizard-options {
     display: flex;
